@@ -27,7 +27,7 @@ static float bsy = 0.0f;
 
 static std::string windowTitle;
 
-#ifndef signbit(x)
+#ifndef signbit
 #define signbit(x) (x < 0 ? -1 : 1)
 #endif
 
@@ -40,7 +40,7 @@ GLuint
 load_texture()
 {
 	int width, height, channels;
-	unsigned char *data = stbi_load("img/win98.png", &width, &height, &channels, 0);
+	unsigned char *data = stbi_load("img/win98.jpg", &width, &height, &channels, 0);
 	if(data == NULL) {
 		std::cerr << "Error loading texture" << std::endl;
 		exit(1);
