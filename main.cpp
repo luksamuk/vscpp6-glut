@@ -6,6 +6,9 @@
 #include <GL/glut.h>
 #include <GL/gl.h>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 #include "fps.hpp"
 #include "keyboard.hpp"
 
@@ -29,6 +32,42 @@ static std::string windowTitle;
 #endif
 
 #define clamp(x, min, max) (x < min ? min : (x > max ? max : x))
+
+static GLuint container_texture = 0;
+static float teapot_angle = 0.0f;
+
+GLuint
+load_texture()
+{
+	int width, height, channels;
+	unsigned char *data = stbi_load("img/win98.png", &width, &height, &channels, 0);
+	if(data == NULL) {
+		std::cerr << "Error loading texture" << std::endl;
+		exit(1);
+	}
+	
+	glEnable(GL_TEXTURE_2D);
+	GLuint texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	//glGenerateMipmap(GL_TEXTURE_2D);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glDisable(GL_TEXTURE_2D);
+	stbi_image_free(data);
+	
+	return texture;
+}
+
+
 
 void
 update(void)
@@ -107,6 +146,10 @@ update(void)
 	bx += bsx * dt;
 	by += bsy * dt;
 
+
+	teapot_angle += 45.0f * dt;
+	teapot_angle -= floor(teapot_angle / 360.0f) * 360.0f;
+
 	/* FPS information on title */
 	int currTime = glutGet(GLUT_ELAPSED_TIME);
 	if(currTime - oldTime > 2000) { // Every 2s
@@ -129,35 +172,48 @@ draw(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// Triangle
+	// Rectangle
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, container_texture);
 	glPushMatrix();
+		glColor4f(1.0f, 1.0f, 1.0f, 0.5f);
 		glTranslatef(x, y, 0.0f);
-		glBegin(GL_TRIANGLES);
-			glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
-			glVertex2f(0.0f, 0.5f);
+		glBegin(GL_QUADS);
+			glTexCoord2f(0.0f, 0.0f);
+			//glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+			glVertex2f(-0.5f, 0.5f);
 
-			glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
-			glVertex2f(-0.35f, -0.5f);
+			glTexCoord2f(1.0f, 0.0f);
+			//glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
+			glVertex2f(0.5f, 0.5f);
 
-			glColor4f(0.0f, 0.0f, 1.0f, 1.0f);
-			glVertex2f(0.35f, -0.5f);
+			glTexCoord2f(1.0f, 1.0f);
+			//glColor4f(0.0f, 0.0f, 1.0f, 1.0f);
+			glVertex2f(0.5f, -0.5f);
+
+			glTexCoord2f(0.0f, 1.0f);
+			//glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+			glVertex2f(-0.5f, -0.5f);
 		glEnd();
 	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
 
 	// Ball
 	float angle = 0.0f;
 	const float radius = 0.3f;
 
 	const float colors[] = {
-		1.0f, 0.0f, 0.0f, 0.5f,
-		0.0f, 1.0f, 0.0f, 0.5f,
-		0.0f, 0.0f, 1.0f, 0.5f,
-		0.5f, 0.2f, 0.0f, 0.5f,
-		0.6f, 0.0f, 0.8f, 0.5f,
-		0.0f, 0.4f, 0.3f, 0.5f
+		1.0f, 0.0f, 0.0f, 1.0f,
+		0.0f, 1.0f, 0.0f, 1.0f,
+		0.3f, 0.2f, 1.0f, 0.3f,
+		0.0f, 0.0f, 1.0f, 1.0f,
+		0.7f, 0.0f, 0.5f, 0.6f,
+		0.5f, 0.2f, 0.0f, 1.0f,
+		0.6f, 0.0f, 0.8f, 1.0f,
+		0.0f, 0.4f, 0.3f, 1.0f,
 	};
 
-	const int num_colors = 5;
+	const int num_colors = sizeof(colors) / (4 * sizeof(float));
 
 	static int color_stride = 0;
 	static int old_time = 0;
@@ -171,7 +227,7 @@ draw(void)
 	glPushMatrix();
 		glTranslatef(bx, by, 1.0f);
 		glBegin(GL_TRIANGLE_FAN);
-		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+		glColor4f(0.0f, 0.0f, 0.0f, 0.0f);
 		glVertex2f(0.0f, 0.0f);
 
 		int current_color = color_stride;
@@ -190,7 +246,13 @@ draw(void)
 		}
 		glEnd();
 	glPopMatrix();
-	
+
+
+	glColor4f(1.0f, 1.0f, 1.0f, 0.3f);
+	glPushMatrix();
+	glRotatef(teapot_angle, 0.0f, 1.0f, 0.0f);
+	glutSolidTeapot(0.3f);
+	glPopMatrix();
 
 	glutSwapBuffers();
 }
@@ -198,6 +260,17 @@ draw(void)
 void
 display(void)
 {
+	static bool init = false;
+
+	if(!init) {
+		glEnable(GL_BLEND);
+		glEnable(GL_TEXTURE_2D);
+
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		container_texture = load_texture();
+		init = true;
+	}
+
 	update();
 	draw();
 }
@@ -266,9 +339,6 @@ main(int argc, char **argv)
 	glutInitWindowSize(WINW, WINH);
 	
 	glutCreateWindow("MyGame");
-
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable(GL_BLEND);
 
 	glutDisplayFunc(display);
 	glutKeyboardFunc(keyDown);
