@@ -20,8 +20,8 @@ static float x = 0.0f;
 static float y = 0.0f;
 
 // Ball with accelerated movement
-static float bx  = 0.0f;
-static float by  = 0.0f;
+static float bx  = -0.5f;
+static float by  = -0.5f;
 static float bsx = 0.0f;
 static float bsy = 0.0f;
 
@@ -40,7 +40,7 @@ GLuint
 load_texture()
 {
 	int width, height, channels;
-	unsigned char *data = stbi_load("img/win98.jpg", &width, &height, &channels, 0);
+	unsigned char *data = stbi_load("img/win98.png", &width, &height, &channels, 0);
 	if(data == NULL) {
 		std::cerr << "Error loading texture" << std::endl;
 		exit(1);
@@ -180,19 +180,19 @@ draw(void)
 		glTranslatef(x, y, 0.0f);
 		glBegin(GL_QUADS);
 			glTexCoord2f(0.0f, 0.0f);
-			//glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+			glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
 			glVertex2f(-0.5f, 0.5f);
 
 			glTexCoord2f(1.0f, 0.0f);
-			//glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
+			glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
 			glVertex2f(0.5f, 0.5f);
 
 			glTexCoord2f(1.0f, 1.0f);
-			//glColor4f(0.0f, 0.0f, 1.0f, 1.0f);
+			glColor4f(1.0f, 1.0f, 0.0f, 1.0f);
 			glVertex2f(0.5f, -0.5f);
 
 			glTexCoord2f(0.0f, 1.0f);
-			//glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+			glColor4f(0.0f, 0.0f, 1.0f, 1.0f);
 			glVertex2f(-0.5f, -0.5f);
 		glEnd();
 	glPopMatrix();
@@ -205,12 +205,13 @@ draw(void)
 	const float colors[] = {
 		1.0f, 0.0f, 0.0f, 1.0f,
 		0.0f, 1.0f, 0.0f, 1.0f,
-		0.3f, 0.2f, 1.0f, 0.3f,
+		0.3f, 0.2f, 1.0f, 1.0f,
 		0.0f, 0.0f, 1.0f, 1.0f,
-		0.7f, 0.0f, 0.5f, 0.6f,
+		0.7f, 0.0f, 0.5f, 1.0f,
 		0.5f, 0.2f, 0.0f, 1.0f,
 		0.6f, 0.0f, 0.8f, 1.0f,
 		0.0f, 0.4f, 0.3f, 1.0f,
+		1.0f, 1.0f, 0.0f, 1.0f,
 	};
 
 	const int num_colors = sizeof(colors) / (4 * sizeof(float));
@@ -227,7 +228,7 @@ draw(void)
 	glPushMatrix();
 		glTranslatef(bx, by, 1.0f);
 		glBegin(GL_TRIANGLE_FAN);
-		glColor4f(0.0f, 0.0f, 0.0f, 0.0f);
+		glColor4f(1.0f, 1.0f, 1.0f, 0.0f);
 		glVertex2f(0.0f, 0.0f);
 
 		int current_color = color_stride;
