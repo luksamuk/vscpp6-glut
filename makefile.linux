@@ -1,0 +1,36 @@
+CXX=g++ --std=c++98
+
+SRC=\
+       fps.cpp\
+       keyboard.cpp\
+       main.cpp
+
+OBJ=\
+    obj/fps.o\
+    obj/keyboard.o\
+    obj/main.o
+
+BIN=bin/MyGame
+
+LIBS=-lGL -lGLU -lglut
+
+.PHONY: dirs clean purge
+
+all: dirs $(BIN)
+
+$(BIN): $(OBJ)
+	$(CXX) -o $@ $(OBJ) $(LIBS)
+
+obj/%.o: %.cpp
+	$(CXX) -c -o $@ $<
+
+
+dirs:
+	@mkdir -p bin/ obj/
+
+clean:
+	rm -rf obj/
+
+purge:
+	rm -rf obj/ bin/
+
