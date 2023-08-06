@@ -20,8 +20,8 @@ static float x = 0.0f;
 static float y = 0.0f;
 
 // Ball with accelerated movement
-static float bx  = -0.5f;
-static float by  = -0.5f;
+static float bx  = 0.0f;
+static float by  = 0.0f;
 static float bsx = 0.0f;
 static float bsy = 0.0f;
 
@@ -35,6 +35,7 @@ static std::string windowTitle;
 
 static GLuint container_texture = 0;
 static float teapot_angle = 0.0f;
+static float teapot_z = 0.0f;
 
 GLuint
 load_texture()
@@ -146,9 +147,14 @@ update(void)
 	bx += bsx * dt;
 	by += bsy * dt;
 
-
+	/* Teapot */
 	teapot_angle += 45.0f * dt;
 	teapot_angle -= floor(teapot_angle / 360.0f) * 360.0f;
+
+	if(kbdPressing(BTN_ACTION2))
+		teapot_z += walkdist;
+	if(kbdPressing(BTN_ACTION1))
+		teapot_z -= walkdist;
 
 	/* FPS information on title */
 	int currTime = glutGet(GLUT_ELAPSED_TIME);
@@ -226,7 +232,7 @@ draw(void)
 	}
 
 	glPushMatrix();
-		glTranslatef(bx, by, 1.0f);
+		glTranslatef(bx, by, -0.2f);
 		glBegin(GL_TRIANGLE_FAN);
 		glColor4f(1.0f, 1.0f, 1.0f, 0.0f);
 		glVertex2f(0.0f, 0.0f);
@@ -249,10 +255,11 @@ draw(void)
 	glPopMatrix();
 
 
-	glColor4f(1.0f, 1.0f, 1.0f, 0.3f);
+	glColor4f(1.0f, 1.0f, 1.0f, 0.6f);
 	glPushMatrix();
-	glRotatef(teapot_angle, 0.0f, 1.0f, 0.0f);
-	glutSolidTeapot(0.3f);
+		glTranslatef(0.0f, 0.0f, teapot_z);
+		glRotatef(teapot_angle, 0.0f, 1.0f, 0.0f);
+		glutSolidTeapot(0.3f);
 	glPopMatrix();
 
 	glutSwapBuffers();
@@ -265,7 +272,7 @@ display(void)
 
 	if(!init) {
 		glEnable(GL_BLEND);
-		glEnable(GL_TEXTURE_2D);
+		glEnable(GL_DEPTH_TEST);
 
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		container_texture = load_texture();
@@ -301,7 +308,9 @@ keyHandle(unsigned char key, bool pressed)
 	case 'k': case 'K':
 		btn = BTN_ACTION1;
 		break;
-	// TODO: Action 2
+	case 'i': case 'I':
+		btn = BTN_ACTION2;
+		break;
 	case 10:
 		btn = BTN_START;
 		break;
