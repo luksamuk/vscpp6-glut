@@ -12,6 +12,19 @@ render_init(void)
 	glEnable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glEnable(GL_LIGHTING);
+	//glEnable(GL_LIGHT0);
+
+	glShadeModel(GL_SMOOTH);
+
+	
+	GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+	GLfloat mat_shininess[] = { 50.0 };
+	GLfloat light_position[] = { 1.0, 0.5, -1.0, 0.0 };
+
+	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+	glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 }
 
 unsigned int

@@ -106,6 +106,10 @@ scene_update(double dt)
 	bx += bsx * dt;
 	by += bsy * dt;
 
+	// Set light 0 position to ball
+	float lightPos[] = {bx, by, -1.0f, 0.0f};
+	glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
+
 	/* Teapot */
 	teapot_angle += 45.0f * dt;
 	teapot_angle -= floor(teapot_angle / 360.0f) * 360.0f;
@@ -123,7 +127,7 @@ _draw_rectangle(void)
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, container_texture);
 	glPushMatrix();
-		glColor4f(1.0f, 1.0f, 1.0f, 0.5f);
+		glColor4f(1.0f, 1.0f, 1.0f, 0.2f);
 		glTranslatef(x, y, 0.0f);
 		glBegin(GL_QUADS);
 			glTexCoord2f(0.0f, 0.0f);
@@ -179,13 +183,13 @@ _draw_ball(void)
 	}
 
 	glPushMatrix();
-		glTranslatef(bx, by, -0.2f);
+		glTranslatef(bx, by, 0.25f);
 		glBegin(GL_TRIANGLE_FAN);
 		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		glVertex2f(0.0f, 0.0f);
 
 		int current_color = color_stride;
-		for(angle = 0.0f; angle < 360.0f; angle += 0.3f) {
+		for(angle = 0.0f; angle < 360.0f; angle += 0.25f) {
 			glColor4f(
 				colors[current_color],
 				colors[current_color + 1],
@@ -205,14 +209,18 @@ _draw_ball(void)
 void
 scene_draw(void)
 {
-	_draw_rectangle();
+	//_draw_rectangle();
 	_draw_ball();
 
 	// Teapot
-	glColor4f(1.0f, 1.0f, 1.0f, 0.6f);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 	glPushMatrix();
-		//glTranslatef(0.0f, 0.0f, teapot_z);
+		glTranslatef(0.0f, 0.0f, teapot_z);
 		glRotatef(teapot_angle, 0.0f, 1.0f, 0.0f);
 		glutSolidTeapot(0.3f);
 	glPopMatrix();
+	glDisable(GL_LIGHTING);
+	glDisable(GL_LIGHT0);
 }

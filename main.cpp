@@ -29,12 +29,17 @@ update(void)
 	int currTime = glutGet(GLUT_ELAPSED_TIME);
 	if(currTime - oldTime > 2000) { // Every 2s
 		std::ostringstream oss;
+
+		double fps = getFps();
+
 		oss.clear();
 		oss << "MyGame | FPS: "
 			<< std::setw(2)
 			<< getFps();
 		windowTitle = oss.str();
 		oldTime = currTime;
+
+		std::cout << "FPS: " << fps << std::endl;
 
 		glutSetWindowTitle(windowTitle.c_str());
 	}
