@@ -3,12 +3,16 @@ CXX=g++ --std=c++98
 SRC=\
        fps.cpp\
        keyboard.cpp\
-       main.cpp
+       main.cpp\
+       render.cpp\
+       scene.cpp
 
 OBJ=\
     obj/fps.o\
     obj/keyboard.o\
-    obj/main.o
+    obj/main.o\
+    obj/render.o\
+    obj/scene.o
 
 BIN=bin/MyGame
 
